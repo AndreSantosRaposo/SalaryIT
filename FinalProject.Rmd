@@ -1,0 +1,166 @@
+---
+title: "Salaries_SoftwareDevelopers"
+author: "André"
+date: "2022-12-27"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+# Software Industry Salary Dataset - 2022
+### This dataset contains information of salaries of various job profiles in India
+The salary values are monthly and in USD
+
+## Process data
+Install and load required packages
+```{r loading package}
+require(tidyverse)
+
+```
+
+Import and prepare dataset <br/>
+```{r import}
+salaries_data_r <- read_csv("Salary_Dataset_with_Extra_Features.csv")
+```
+
+Changing column names to a more apropriate format
+```{r correct column names}
+colnames(salaries_data_r)[3] <- "job_title";
+colnames(salaries_data_r)[2] <- "company_name"
+colnames(salaries_data_r)[8] <- "job_roles"
+colnames(salaries_data_r)[5] <-  "salaries_reported"
+
+```
+
+
+Converting the salary values from rupees to US Dollars
+```{r convertion}
+salaries_data<- salaries_data_r %>% 
+  mutate(salary_d = Salary*0.12)
+```
+
+# Charts
+
+## Salaries per jobs
+
+### Top 10 best paying jobs
+```{r tenBestJobs}
+salaries_data %>%
+  group_by(job_title) %>%
+  summarize(average_salary = mean(salary_d)) %>%
+  arrange(desc(average_salary)) %>% 
+  slice(1:10) %>% 
+  ggplot()+
+  geom_col(mapping = aes(x = average_salary ,y=reorder(job_title, average_salary) ), fill="darkblue") +    
+  scale_x_continuous(labels=scales::dollar_format()) +          ## Axis labels
+  labs(title= "Top 10  best paying jobs")+ theme(plot.title = element_text(hjust = 0.5)) +    ##Titulo
+  ylab("Job Title") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))+    ##Axis
+  geom_text(aes(x = average_salary, y = reorder(job_title, average_salary), label = format(floor(average_salary),digits=10)),position = position_dodge(width = 0.9),hjust = 1.1, color="white", fontface="bold")
+```
+
+### Top 10 worst paying jobs
+```{r tenWorstJobs}
+salaries_data %>%
+  group_by(job_title) %>%
+  summarize(average_salary = mean(salary_d)) %>%
+  arrange(average_salary) %>%
+  slice(1:10) %>% 
+  ggplot()+
+  geom_col(mapping = aes(x = average_salary ,y=reorder(job_title, average_salary) ), fill="darkblue") +    
+  geom_col(mapping = aes(x = average_salary ,y=reorder(job_title, average_salary) ), fill="darkblue") +    
+  scale_x_continuous(labels=scales::dollar_format()) +          ## Axis labels
+  labs(title= "Top 10  worst paying jobs")+ theme(plot.title = element_text(hjust = 0.5)) +    ##Titulo
+  ylab("Job Title") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))+    ##Axis
+  geom_text(aes(x = average_salary, y = reorder(job_title, average_salary), label = format(floor(average_salary),digits=10)),position = position_dodge(width = 0.9),hjust = 1.1, color="white", fontface="bold")
+```
+
+### Top 10 worst paying jobs excluding internships
+```{r tenWorstJobsNI}
+salaries_data %>%
+  filter(!grepl("Intern", job_title)) %>%
+  group_by(job_title) %>%
+  summarize(average_salary = mean(salary_d)) %>%
+  arrange(average_salary) %>%
+  slice(1:10) %>% 
+  ggplot()+
+  geom_col(mapping = aes(x = average_salary ,y=reorder(job_title, average_salary) ), fill="darkblue") +    
+  scale_x_continuous(labels=scales::dollar_format()) +          ## Axis labels
+  labs(title= "Top 10  worst paying jobs", subtitle = "Excluding internships")+ theme(plot.title = element_text(hjust = 0.5),plot.subtitle = element_text(hjust = 0.5)) +    ##Titulo
+  ylab("Job Title") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))+    ##Axis
+  geom_text(aes(x = average_salary, y = reorder(job_title, average_salary), label = format(floor(average_salary),digits=10)),position = position_dodge(width = 0.9),hjust = 1.1, color="white", fontface="bold")
+  
+```
+
+## Salary per company
+
+### Top 10 best paying companies
+```{r tenBestCompanies}
+salaries_data %>% 
+  group_by(company_name) %>% 
+  summarize(average_salary=mean(salary_d)) %>% 
+  arrange(desc(average_salary)) %>% 
+  slice(1:10) %>% 
+  ggplot()+
+    geom_col(mapping=aes(x= average_salary, y=reorder(company_name, average_salary)),fill="darkblue")+
+    scale_x_continuous(labels=scales::dollar_format()) +                                     ## Axis labels
+    labs(title= "Top 10 best paying companies")+ theme(plot.title = element_text(hjust = 0.5))+      ## Title
+    geom_text(aes(x= average_salary, y=reorder(company_name, average_salary), label = format(floor(average_salary),digits=10)),hjust=0.75, color="red", fontface="bold")+
+    ylab("Company Name") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
+
+```
+
+### Top 10 worst paying comapnies
+```{r tenWorstCompanies}
+salaries_data %>% 
+  group_by(company_name) %>% 
+  summarize(average_salary=mean(salary_d)) %>% 
+  filter(company_name != "....") %>%
+  arrange(average_salary)%>% 
+  slice(1:10) %>% 
+  ggplot()+
+  geom_col(mapping=aes(x= average_salary, y=reorder(company_name, average_salary)),fill="darkblue")+
+  scale_x_continuous(labels=scales::dollar_format()) +                                     ## Axis labels
+  labs(title= "Top 10 worst paying companies")+ theme(plot.title = element_text(hjust = 0.5))+      ## Title
+  geom_text(aes(x= average_salary, y=reorder(company_name, average_salary), label = format(floor(average_salary),digits=10)),hjust=1.2,        color="white", fontface="bold")+
+  ylab("Company Name") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) +  theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
+
+```
+
+## Salary per location
+```{r Salary location}
+salaries_data %>% 
+  group_by(Location) %>% 
+  summarize(average_salary=mean(salary_d)) %>% 
+  arrange(average_salary)%>% 
+  ggplot()+
+  geom_col(mapping=aes(x= average_salary, y=reorder(Location, average_salary)),fill="darkblue")+
+  scale_x_continuous(labels=scales::dollar_format()) +                                     ## Axis labels
+  labs(title= "Average salary per city")+ theme(plot.title = element_text(hjust = 0.5))+      ## Title
+  geom_text(aes(x= average_salary, y=reorder(Location, average_salary), label = format(floor(average_salary),digits=10)),hjust=1.2, color="white", fontface="bold")+
+  ylab("City") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
+
+```
+
+## Pay by roles
+```{r Salary roles}
+salaries_data %>% 
+  group_by(job_roles) %>% 
+  summarize(average_salary=mean(salary_d)) %>% 
+  arrange(average_salary)%>% 
+  ggplot()+
+  geom_col(mapping=aes(x= average_salary, y=reorder(job_roles, average_salary)),fill="darkblue")+
+  scale_x_continuous(labels=scales::dollar_format()) +                                     ## Axis labels
+  labs(title= "Average salary per roles")+ theme(plot.title = element_text(hjust = 0.5))+      ## Title
+  geom_text(aes(x= average_salary, y=reorder(job_roles, average_salary), label = format(floor(average_salary),digits=10)),hjust=1.2, color="white", fontface="bold")+
+  ylab("Role") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
+
+```
+
+## Average salary reports
+```{r calculate reports average}
+salaries_data %>%
+  summarize(average_reports = mean (salaries_reported))
+```
+A low average number of reports, *1.82* in this cases, indicates that the data may not be accurate and more data should be collected.
+
