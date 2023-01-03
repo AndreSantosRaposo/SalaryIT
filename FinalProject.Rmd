@@ -13,7 +13,7 @@ output:
 The salary values are monthly and in USD
 
 ## Process data
-Install and load required packages
+Load required packages
 ```{r loading package}
 require(tidyverse)
 
