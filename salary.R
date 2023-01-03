@@ -16,7 +16,7 @@ salaries_data<- salaries_data_r %>%
 head(salaries_data)
 
 ## Top 10 best paying jobs
-## Ordenar as barras. Primeiro agrupa, faz média, corta, ggplot, cria os eixos e ordena as barras
+## Ordenar as barras. Primeiro agrupa, faz mC)dia, corta, ggplot, cria os eixos e ordena as barras
 salaries_data %>%
   group_by(job_title) %>%
   summarize(average_salary = mean(salary_d)) %>%
@@ -69,9 +69,9 @@ salaries_data %>%
   slice(1:10) %>% 
   ggplot()+
     geom_col(mapping=aes(x= average_salary, y=reorder(company_name, average_salary)),fill="darkblue")+
-    scale_x_continuous(labels=scales::dollar_format()) +                                     ## Axis labels
+    scale_x_continuous(labels=scales::dollar_format(),expand = expansion(mult = c(0, .18))) +                                     ## Axis labels
     labs(title= "Top 10 best paying companies")+ theme(plot.title = element_text(hjust = 0.5))+      ## Title
-    geom_text(aes(x= average_salary, y=reorder(company_name, average_salary), label = format(floor(average_salary),digits=10)),hjust=0.75, color="red", fontface="bold")+
+    geom_text(aes(x= average_salary, y=reorder(company_name, average_salary), label = format(floor(average_salary),digits=10)),hjust=0, color="black", fontface="bold")+
     ylab("Company Name") + xlab("Average Salary")+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
 
 ## Top 10 worst paying companies
