@@ -90,7 +90,6 @@ salaries_data %>%
 
 
 
-
 ##Salary per locations
 salaries_data %>% 
   group_by(Location) %>% 
